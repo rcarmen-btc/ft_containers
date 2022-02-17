@@ -5,8 +5,7 @@
 
 
 namespace ft {
-    
+        
 }; /* namespace ft */
-
 
 #endif /* _STACK_HPP_ */
