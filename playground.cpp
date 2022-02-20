@@ -11,6 +11,8 @@ template<class T> inline
 int main() {
 
 	int a[] = {1, 2, 3, 4};
-	// int c = sum_all(a, &a[3]);
-	// std::cout << c << std::endl;
+	int c = sum_all(a, &a[3]);
+	std::cout << c << std::endl;
+
+	std::cout << "HI" << std::endl;
 }
