@@ -14,13 +14,14 @@ namespace ft {
         typedef typename C::size_type size_type;
 
         // stack();
-        stack(const container_type& ctnr = container_type());
+        stack(const container_type& ctnr = container_type()) {
+            c = ctnr;
+        }
 
-        bool empty() const;
-        size_type size() const;
-
+        bool empty() const { return c.empty(); }
+        size_type size() const { return c.size(); };
     protected:
-        C ctnr;
+        C c;
         };
     
 }; /* namespace ft */
