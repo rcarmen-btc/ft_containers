@@ -44,19 +44,10 @@ int main() {
 
 	std::cout << "\033[0;32m[SUCCESS] stack testing <utility>\033[m" << std::endl;
 
-	ft::pair<char, ft::pair<char, char>> trio('a', ft::make_pair('b', 'c'));
-
-	std::cout << trio.second.second << std::endl;
-
 	// ------------------------------------------------------------------------
 	// END_PAIR END_PAIR END_PAIR END_PAIR END_PAIR END_PAIR END_PAIR END_PAIR  
 	// ========================================================================
 	
-
-	
-
-
-
 
 
 	// =======================================================================
