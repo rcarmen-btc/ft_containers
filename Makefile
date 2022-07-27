@@ -1,57 +1,100 @@
-FT_NAME = ft.out
-STD_NAME = std.out
+FT_NAME =	ft
+STD_NAME =	std
 
-FT_OUT_DIR = ft_out/
-STD_OUT_DIR = std_out/
+OUT_DIR =	outs/
 
-OBJ_DIR = obj/
+INC =		stack.hpp templates.hpp utility.hpp
+FT_SRC =	ft.cpp
+STD_SRC =	std.cpp
 
-FT_SRC = ft.cpp
-STD_SRC = std.cpp
-
-HEADERS = stack.hpp
 FT_OBJ =	$(patsubst %.cpp, %.o, $(FT_SRC))
 STD_OBJ =	$(patsubst %.cpp, %.o, $(STD_SRC))
 
-CPP = c++
-FLAGS = -Wall -Wextra -Werror  
+INC_DIR = 	headers/
+SRC_DIR = 	src/
+OBJ_DIR = 	obj/
 
-all: dirs ft std
-	@echo -e "\e[92m"
-	./ft.out > $(FT_OUT_DIR)ft
-	./std.out > $(STD_OUT_DIR)std
-	@echo -e "\e[96m"
-	@echo -e "diff $(STD_OUT_DIR)ft $(FT_OUT_DIR)std > diff"
-	@echo -e "\e[91m"
-	@diff $(STD_OUT_DIR)ft $(FT_OUT_DIR)std > diff
+INC_PATH =		$(addprefix $(INC_DIR), $(INC))
+FT_SRC_PATH =	$(addprefix $(SRC_DIR), $(FT_SRC))
+FT_OBJ_PATH =	$(addprefix $(OBJ_DIR), $(FT_OBJ))
 
-ft: $(FT_OBJ)
-	@echo -e "\e[93m"
-	$(CPP) $^ -o $(FT_NAME) 
+STD_SRC_PATH =	$(addprefix $(SRC_DIR), $(STD_SRC))
+STD_OBJ_PATH =	$(addprefix $(OBJ_DIR), $(STD_OBJ))
 
-std: $(STD_OBJ)
-	@echo -e "\e[93m"
-	$(CPP) $^ -o $(STD_NAME) 
+CC = c++
+CFLAGS = # -Wall -Wextra -Werror -std=c++98
+OPT_FLUGS = -O -g3 -pipe
 
-%.o: %.cpp $(HEADERS)
-	@echo -e "\e[93m"
-	$(CPP) $(FLAGS) -c $< -o  $@
+COM_COLOR   = \033[0;34m
+OBJ_COLOR   = \033[0;36m
+OK_COLOR    = \033[0;32m
+ERROR_COLOR = \033[0;31m
+WARN_COLOR  = \033[0;33m
+NO_COLOR    = \033[m
 
-dirs:
-	@mkdir -p $(OBJ_DIR)
-	@mkdir -p $(FT_OUT_DIR)
-	@mkdir -p $(STD_OUT_DIR)
+OK_STRING    = "[OK]"
+ERROR_STRING = "[ERROR]"
+WARN_STRING  = "[WARNING]"
+COM_STRING   = "Compiling"
+
+define run
+printf "%b" "$(COM_COLOR)$(COM_STRING) $(OBJ_COLOR)$(@F)$(NO_COLOR)\r"; \
+$(1) 2> $@.log; \
+RESULT=$$?; \
+if [ $$RESULT -ne 0 ]; then \
+  printf "%-60b%b" "$(COM_COLOR)$(COM_STRING)$(OBJ_COLOR) $@" "$(ERROR_COLOR)$(ERROR_STRING)$(NO_COLOR)\n"   ; \
+elif [ -s $@.log ]; then \
+  printf "%-60b%b" "$(COM_COLOR)$(COM_STRING)$(OBJ_COLOR) $@" "$(WARN_COLOR)$(WARN_STRING)$(NO_COLOR)\n"   ; \
+else  \
+  printf "%-60b%b" "$(COM_COLOR)$(COM_STRING)$(OBJ_COLOR) $(@F)" "$(OK_COLOR)$(OK_STRING)$(NO_COLOR)\n"   ; \
+fi; \
+cat $@.log; \
+rm -f $@.log; \
+exit $$RESULT
+endef
+
+all: obj $(FT_NAME) $(STD_NAME)  
+
+$(FT_NAME):  $(FT_OBJ_PATH) 
+	@$(CC) $^ -o $(FT_NAME) -I$(INC_DIR)
+
+$(STD_NAME):  $(STD_OBJ_PATH) 
+	@$(CC) $^ -o $(STD_NAME) -I$(INC_DIR)
+
+VPATH = $(SRC_DIR)
+
+$(OBJ_DIR)%.o: %.cpp $(INC_PATH)
+	@$(call run, $(CC) $(CFLAGS) $(OPT_FLUGS) -c $< -o $@ -I$(INC_DIR))
+	
+
+diff: $(OUT_DIR)
+	./ft > $(OUT_DIR)ft.txt
+	./std > $(OUT_DIR)out.txt
+	diff $(OUT_DIR)ft.txt $(OUT_DIR)out.txt
+
+$(OUT_DIR):
+	@mkdir -p $(OUT_DIR)
+
+obj:
+	@mkdir -p obj/
 
 clean:
-	rm -rf $(FT_OBJ);
-	rm -rf $(STD_OBJ);
-	rm -f $(FT_OUT_DIR)ft
-	rm -f $(STD_OUT_DIR)std
-	rm -f diff
+	@if [ -e $(OBJ_DIR) ]; then \
+		rm -rf $(OBJ_DIR); \
+  		printf "%-60b%b" "$(COM_COLOR)Deletion $(OBJ_COLOR)$(OBJ_DIR)" "$(OK_COLOR)$(OK_STRING)$(NO_COLOR)\n"; \
+	else \
+  		printf "%-41b%b" "$(COM_COLOR)Deletion $(OBJ_COLOR)$(OBJ_DIR)" "$(ERROR_COLOR)[There is no such directory]$(NO_COLOR)\n"; \
+	fi;
 
 fclean: clean
-	rm -f $(FT_NAME);
-	rm -f $(STD_NAME);
+	@if [ -e $(NAME) ]; then \
+		rm -f $(FT_NAME); \
+		rm -f $(STD_NAME); \
+		rm -rf $(OUT_DIR); \
+  		printf "%-60b%b" "$(COM_COLOR)Deletion $(OBJ_COLOR)$(NAME)" "$(OK_COLOR)$(OK_STRING)$(NO_COLOR)\n"; \
+	else \
+  		printf "%-41b%b" "$(COM_COLOR)Deletion $(OBJ_COLOR)$(NAME)" "$(ERROR_COLOR)[There is no such file]$(NO_COLOR)\n"; \
+	fi;
 
 re: fclean all
 
