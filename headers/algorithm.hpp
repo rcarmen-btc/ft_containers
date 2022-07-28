@@ -17,7 +17,17 @@ namespace ft {
         bool equal(InIt1 first, InIt1 last, InIt2 x, Pred pr);
 
     template<class BidIt1, class BidIt2>
-        BidIt2 copy_backward(BidIt1 first, )
+        BidIt2 copy_backward(BidIt1 first, BidIt1 last, BidIt2 x);
+
+    template<class FwdIt, class T>
+        void fill(FwdIt first, FwdIt last, const T &x);
+
+    template<class T> inline
+        void swap(T &X, T &Y) {
+            T tmp = X;
+            X = Y;
+            Y = tmp;
+        }
 
 }; /* namespace ft */
 

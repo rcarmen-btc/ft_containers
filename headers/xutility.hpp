@@ -380,6 +380,24 @@ namespace ft {
             bool operator>=(const reverse_iterator<RanIt> &X, const reverse_iterator<RanIt> &Y) {
                 return (!(Y < X));
             }
+        
+        template<class InIt, class Dist> inline
+            void advance(InIt &p, Dist n) {
+                p += n;
+            }
+        
+        template<class InIt, class OutIt> inline
+            OutIt copy(InIt F, InIt L, OutIt X) {
+                for (; F != L; ++X, ++F)
+                    *X = *F;
+                return (X);
+            }
+        
+        template<class FwdIt, class T> inline
+            void fill(FwdIt F, FwdIt L, const T &X) {
+                for (; F != L; ++F)
+                    *F = X; 
+            }
 
 }; /* namespace ft */
 

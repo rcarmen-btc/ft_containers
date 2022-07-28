@@ -66,7 +66,7 @@ namespace ft {
 
         vector(const Myt &X): Mybase(X.Alval) {
             if (Buy(X.size()))
-                Last = Ucopy(X.begin(), X.end(), first);
+                Last = Ucopy(X.begin(), X.end(), First);
         }
 
         template<class It>
@@ -83,7 +83,7 @@ namespace ft {
 
         template<class It>
             void Construct(It F, It L, input_iterator_tag) {
-                Buy(N);
+                Buy(0);
                 insert(begin(), F, L);
             }
         
@@ -101,7 +101,7 @@ namespace ft {
                 Destroy(Q, Last);
                 Last = First + X.size();
             }
-            else if (X.size() <= capaciry()) {
+            else if (X.size() <= capacity()) {
                 const_iterator S = X.begin() + size();
                 copy(X.begin(), S, First);
                 Last = Ucopy(S, X.end(), Last);
@@ -320,6 +320,75 @@ namespace ft {
             }
         }
 
+        template<class It>
+            void insert(iterator P, It F, It L) {
+                Insert(P, F, L, Iter_cat(F));
+            }
+
+        template<class It>
+            void Insert(iterator P, It F, It L, Int_iterator_tag) {
+                insert(P, (size_type)F, (T)L);
+            }
+
+        template<class It>
+            void Insert(iterator P, It F, It L, input_iterator_tag) {
+                for (; F != L; ++F, ++P)
+                    P = insert(P, *F);
+            }
+
+        template<class It>
+            void Insert(iterator P, It F, It L, forward_iterator_tag) {
+                size_type M = 0;
+                Distance(F, L, M);
+                size_type N = capacity();
+                if (M == 0)
+                    ;
+                else if (max_size() - size() < M)
+                    Xlen();
+                else if (N < size() + M) {
+                    N = max_size() - N / 2 < N ? 0 : N + N / 2;
+                    if (N < size() + M)
+                        N = size() + M;
+                    pointer S = Mybase::Alval.allocate(N, (void *)0);
+                    pointer Q;
+                    try {
+                        Q = Ucopy(begin(), P, S);
+                        Q = Ucopy(F, L, Q);
+                        Ucopy(P, end(), Q);
+                    } catch (...) {
+                        Destroy(S, Q);
+                        Mybase::Alval.deallocate(S, N);
+                        throw;
+                    }
+                    if (First != 0) {
+                        Destroy(First, Last);
+                        Mybase::Alval.deallocate(First, End - First);
+                    }
+                    End = S + N;
+                    Last = S + size() + M;
+                    First = S;
+                }
+                else if ((size_type)(end() - P) < M) {
+                    Ucopy(P, end(), P.base() + M);
+                    It Mid = F;
+                    advance(Mid, end() - P);
+                    try {
+                        Ucopy(Mid, L, Last);
+                    } catch (...) {
+                        Destroy(P.base() + M, Last + M);
+                        throw;
+                    }
+                    Last += M;
+                    copy(F, Mid, P);
+                }
+                else if (0 < M) {
+                    iterator end0 = end();
+                    Last = Ucopy(end0 - M, end0, Last);
+                    copy_backward(P, end0 - M, end0);
+                    fill(F, L, P);
+                }
+            }
+
         iterator erase(iterator P) {
             copy(P + 1, end(), P);
             Destroy(Last - 1, Last);
@@ -407,6 +476,19 @@ namespace ft {
                 return (Q);
             }
         
+        template<class It>
+            pointer Ufill(pointer Q, size_type N, const T &X) {
+                pointer Qs = Q;
+                try {
+                    for (; 0 < N; --N, ++Q) 
+                        Mybase::Alval.construct(Q, X);
+                } catch (...) {
+                    Destroy(Qs, Q);
+                    throw;
+                }
+                return (Q);
+            }
+
         void Xlen() const {
             throw length_error("ft::vector<T> too long");
         }
