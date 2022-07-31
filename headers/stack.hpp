@@ -2,11 +2,11 @@
 #ifndef _STACK_HPP_
 #define _STACK_HPP_
 #include <iosfwd>
-#include <vector>
+#include "vector.hpp"
 #include <iostream>
 
 namespace ft {
-    template <class T, class C = std::vector<T> >
+    template <class T, class C = ft::vector<T> >
         class stack {
     public:
         typedef C container_type;

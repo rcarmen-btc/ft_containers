@@ -4,8 +4,8 @@
 #include <iosfwd>
 #include <memory>
 #include <stdexcept>
-#include "xutility.hpp"
 #include "algorithm.hpp"
+#include "xutility.hpp"
 
 namespace ft {
 
@@ -14,7 +14,7 @@ namespace ft {
         class Vector_val {
     protected:
         Vector_val(A Al = A()): Alval(Al) {}
-        typedef typename A::template rebind<T>::other Alty;
+        typedef typename A::rebind<T>::other Alty;
         Alty Alval;
         };
         
@@ -29,17 +29,17 @@ namespace ft {
         typedef A                               allocator_type;
         typedef typename A::size_type           size_type;
         typedef typename A::difference_type     difference_type;
-        typedef typename A::pinter              Tptr;
-        typedef typename A::const_pinter        Ctptr;
+        typedef typename A::pointer              Tptr;
+        typedef typename A::const_pointer        Ctptr;
         typedef Tptr                            pointer;
         typedef Ctptr                           const_pointer;
         typedef typename A::reference           reference; 
         typedef typename A::const_reference     const_reference; 
         typedef typename A::value_type          value_type; 
-        typedef Ptrit<value_type, difference_type, Tptr, reference, Tptr, reference>        iterator;
-        typedef Ptrit<value_type, difference_type, Ctptr, const_reference, Tptr, reference> const_iterator;
-        typedef std::reverse_iterator<iterator>                                             reverse_iterator;
-        typedef std::reverse_iterator<const_iterator>                                       const_reverse_iterator;
+        typedef ft::Ptrit<value_type, difference_type, Tptr, reference, Tptr, reference>        iterator;
+        typedef ft::Ptrit<value_type, difference_type, Ctptr, const_reference, Tptr, reference> const_iterator;
+        typedef ft::reverse_iterator<iterator>                                             reverse_iterator;
+        typedef ft::reverse_iterator<const_iterator>                                       const_reverse_iterator;
 
         vector(): Mybase() { 
             Buy(0); 
@@ -74,19 +74,6 @@ namespace ft {
                 Construct(F, L, Iter_cat(F));
             }
 
-        template<class It>
-            void Construct(It F, It L, Int_iterator_tag) {
-                size_type N = (size_type)F;
-                if (Buy(N))
-                    Last = Ufill(First, N, (T)L);
-            }
-
-        template<class It>
-            void Construct(It F, It L, input_iterator_tag) {
-                Buy(0);
-                insert(begin(), F, L);
-            }
-        
         ~vector() {
             Clear();
         }
@@ -111,11 +98,11 @@ namespace ft {
                 Mybase::Alval.deallocate(First, End - First);
                 if (Buy(X.size()))
                     Last = Ucopy(X.begin(), X.end(), First);
-                return (*this);
             }
+            return (*this);
         }
 
-        void reverse(size_type N) {
+        void reserve(size_type N) {
             if (max_size() < N)
                 Xlen();
             else if (capacity() < N) {
@@ -184,7 +171,7 @@ namespace ft {
         }
 
         size_type size() const {
-            return (First() == 0 ? 0 : Last - First);
+            return (First == 0 ? 0 : Last - First);
         }
 
         size_type max_size() const {
@@ -248,17 +235,6 @@ namespace ft {
                 Assing(F, L, Iter_cat(F));
             }
 
-        template<class It>
-            void Assing(It F, It L, Int_iterator_tag) {
-                assign((size_type)F, (T)L);
-            }
-        
-        template<class It>
-            void Assing(It F, It L, input_iterator_tag) {
-                erase(begin(), end());
-                insert(begin(), F, L);
-            }
-        
         void assign(size_type N, const T &X) {
             T Tx = X;
             erase(begin(), end());
@@ -266,7 +242,7 @@ namespace ft {
         }
 
         iterator insert(iterator P, const T &X) {
-            size_type Off = size() = 0 ? 0 : P - begin();
+            size_type Off = size() == 0 ? 0 : P - begin();
             insert(P, (size_type)1, X);
             return (begin() + Off);
         }
@@ -279,10 +255,10 @@ namespace ft {
             else if (max_size() - size() < M)
                 Xlen();
             else if (N < size() + M) {
-                N = max_size() - N / 2 < N ? 0 : N + N / 2;
+                N = max_size() - N / 2 < N ? 0 : N + N / 1;
                 if (N < size() + M)
                     N = size() + M;
-                pointer S = Mybase::Alval::allocate(N, (void *)0);
+                pointer S = Mybase::Alval.allocate(N, (void *)0);
                 pointer Q;
                 try {
                     Q = Ucopy(begin(), P, S);
@@ -290,12 +266,12 @@ namespace ft {
                     Ucopy(P, end(), Q);
                 } catch (...) {
                     Destroy(S, Q);
-                    Mybase::Alval::deallocate(S, N);
+                    Mybase::Alval.deallocate(S, N);
                     throw;
                 }
                 if (First != 0) {
                     Destroy(First, Last);
-                    Mybase::Alval::deallocate(First, End - First);
+                    Mybase::Alval.deallocate(First, End - First);
                 }
                 End = S + N;
                 Last = S + size() + M;
@@ -325,6 +301,73 @@ namespace ft {
                 Insert(P, F, L, Iter_cat(F));
             }
 
+        iterator erase(iterator P) {
+            copy(P + 1, end(), P);
+            Destroy(Last - 1, Last);
+            --Last;
+            return (P);
+        }
+
+        iterator erase(iterator F, iterator L) {
+            if (F != L) {
+                pointer S = copy(L, end(), F.base());
+                Destroy(S, Last);
+                Last = S;
+            }
+            return (F);
+        }
+
+        void clear() {
+            erase(begin(), end());
+        }
+
+        void swap(Myt &X) {
+            if (Mybase::Alval == X.Alval) {
+                ft::swap(First, X.First);
+                ft::swap(Last, X.Last);
+                ft::swap(End, X.End);
+            }
+            else {
+                Myt Ts = *this;
+                *this = X;
+                X = Ts;
+            }
+        }
+
+    protected:
+
+        bool Eq(const Myt &X) const {
+            return (size() == X.size() && equal(begin(), end(), X.begin()));
+        }
+
+        bool Lt(const Myt &X) const {
+            return (lexicographical_complare(begin(), end(), X.begin(), X.end()));
+        }
+
+        template<class It>
+            void Construct(It F, It L, Int_iterator_tag) {
+                size_type N = (size_type)F;
+                if (Buy(N))
+                    Last = Ufill(First, N, (T)L);
+            }
+
+        template<class It>
+            void Construct(It F, It L, input_iterator_tag) {
+                Buy(0);
+                insert(begin(), F, L);
+            }
+        
+        template<class It>
+            void Assing(It F, It L, Int_iterator_tag) {
+                assign((size_type)F, (T)L);
+            }
+        
+        template<class It>
+            void Assing(It F, It L, input_iterator_tag) {
+                erase(begin(), end());
+                insert(begin(), F, L);
+            }
+        
         template<class It>
             void Insert(iterator P, It F, It L, Int_iterator_tag) {
                 insert(P, (size_type)F, (T)L);
@@ -346,7 +389,7 @@ namespace ft {
                 else if (max_size() - size() < M)
                     Xlen();
                 else if (N < size() + M) {
-                    N = max_size() - N / 2 < N ? 0 : N + N / 2;
+                    N = max_size() - N / 2 < N ? 0 : N + N / 1;
                     if (N < size() + M)
                         N = size() + M;
                     pointer S = Mybase::Alval.allocate(N, (void *)0);
@@ -389,50 +432,8 @@ namespace ft {
                 }
             }
 
-        iterator erase(iterator P) {
-            copy(P + 1, end(), P);
-            Destroy(Last - 1, Last);
-            --Last;
-            return (P);
-        }
-
-        iterator erase(iterator F, iterator L) {
-            if (F != L) {
-                pointer S = copy(L, end(), F.base());
-                Destroy(S, Last);
-                Last = S;
-            }
-            return (F);
-        }
-
-        void clear() {
-            erase(begin(), end());
-        }
-
-        bool Eq(const Myt &X) const {
-            return (size() == X.size() && equal(begin(), end(), X.begin()));
-        }
-
-        bool Lt(const Myt &X) const {
-            return (lexicographical_complare(begin(), end(), X.begin(), X.end()));
-        }
-
-        void swap(Myt &X) {
-            if (Mybase::Alval == X.Alval) {
-                ft::swap(First, X.First);
-                ft::swap(Last, X.Last);
-                ft::swap(End, X.End);
-            }
-            else {
-                Myt Ts = *this;
-                *this = X;
-                X = Ts;
-            }
-        }
-
-    protected:
         bool Buy(size_type N) {
-            Frist = 0;
+            First = 0;
             Last = 0;
             End = 0;
 
@@ -451,11 +452,9 @@ namespace ft {
                 Destroy(First, Last);
                 Mybase::Alval.deallocate(First, End - First);
             }
-
-            Frist = 0;
+            First = 0;
             Last = 0;
             End = 0;
-
         }
 
         void Destroy(pointer F, pointer L) {
@@ -476,25 +475,24 @@ namespace ft {
                 return (Q);
             }
         
-        template<class It>
-            pointer Ufill(pointer Q, size_type N, const T &X) {
-                pointer Qs = Q;
-                try {
-                    for (; 0 < N; --N, ++Q) 
-                        Mybase::Alval.construct(Q, X);
-                } catch (...) {
-                    Destroy(Qs, Q);
-                    throw;
-                }
-                return (Q);
+        pointer Ufill(pointer Q, size_type N, const T &X) {
+            pointer Qs = Q;
+            try {
+                for (; 0 < N; --N, ++Q) 
+                    Mybase::Alval.construct(Q, X);
+            } catch (...) {
+                Destroy(Qs, Q);
+                throw;
             }
+            return (Q);
+        }
 
         void Xlen() const {
-            throw length_error("ft::vector<T> too long");
+            throw std::length_error("ft::vector<T> too long");
         }
 
         void Xran() const {
-            throw out_of_range("ft::vector<T> subscript");
+            throw std::out_of_range("ft::vector<T> subscript");
         }
 
         pointer First, Last, End;
@@ -532,10 +530,10 @@ namespace ft {
         }
 
     template<class T, class A> inline
-        bool swap(vector<T, A> &X, vector<T, A> &Y) {
+        void swap(vector<T, A> &X, vector<T, A> &Y) {
             X.swap(Y);
         }
-
+    
 }; /* namespace ft */
 
 #endif /* _VECTOR_HPP_ */

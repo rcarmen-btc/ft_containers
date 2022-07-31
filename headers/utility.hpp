@@ -70,6 +70,14 @@ namespace ft {
         bool operator>=(const T1 &x, const T1 &y)
             { return (!(x < y)); }
 
+    template <bool, typename T = void>
+        struct enable_if {};
+
+    template <typename T>
+        struct enable_if<true, T> {
+            typedef T type;
+        };
+
 }; /* namespace ft */
 
 #endif /* _UTILITY_HPP_ */

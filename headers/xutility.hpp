@@ -34,7 +34,7 @@ namespace ft {
         struct iterator_traits {
             typedef typename It::iterator_category iterator_category;
             typedef typename It::value_type value_type;
-            typedef typename It::distance_type distance_type;
+            typedef typename It::difference_type difference_type;
             typedef typename It::pointer pointer;
             typedef typename It::reference reference;
         };
@@ -43,7 +43,7 @@ namespace ft {
         struct iterator_traits<T *> {
             typedef random_access_iterator_tag iterator_category;
             typedef T value_type;
-            typedef ptrdiff_t distance_type;
+            typedef ptrdiff_t difference_type;
             typedef T *pointer;
             typedef T &reference;
         };
@@ -52,7 +52,7 @@ namespace ft {
         struct iterator_traits<const T *> {
             typedef random_access_iterator_tag iterator_category;
             typedef T value_type;
-            typedef ptrdiff_t distance_type;
+            typedef ptrdiff_t difference_type;
             typedef const T *pointer;
             typedef const T &reference;
         };
@@ -143,108 +143,107 @@ namespace ft {
         }
     
     template<class T, class D, class Pt, class Rt, class Pt2, class Rt2>
-        class Ptrit: public iterator<ft::random_access_iterator_tag, T, D, Pt, Rt> {
+        class Ptrit: public iterator<random_access_iterator_tag, T, D, Pt, Rt> {
+        public:
 
-    public:
+            typedef Ptrit<T, D, Pt, Rt, Pt2, Rt2> Myt;
 
-        typedef Ptrit<T, D, Pt, Rt, Pt2, Rt2> Myt;
+            Ptrit() {}
 
-        Ptrit() {}
+            explicit Ptrit(Pt P): current(P) {}
 
-        explicit Ptrit(Pt P): current(P) {}
+            Ptrit(const Ptrit<T, D, Pt2, Rt2, Pt2, Rt2> &X): current(X.base()) {}
 
-        Ptrit(const Ptrit<T, D, Pt2, Rt2, Pt2, Rt2> &X): current(X.base()) {}
+            Pt base() const {
+                return (current);
+            }
 
-        Pt base() {
-            return (current);
-        }
+            Rt operator*() const {
+                return (*current);
+            }
 
-        Rt operator*() const {
-            return (*current);
-        }
+            Pt operator->() const {
+                return (&**this);
+            }
+            
+            Myt& operator++() {
+                ++current;
+                return (*this);
+            }
 
-        Pt operator->() const {
-            return (&**this);
-        }
-        
-        Myt& operator++() {
-            ++current;
-            return (*this);
-        }
+            Myt operator++(int) {
+                Myt Tmp = *this;
+                ++current;
+                return (*this);
+            }
+            
+            Myt& operator--() {
+                --current;
+                return (*this);
+            }
 
-        Myt operator++(int) {
-            Myt Tmp = *this;
-            ++current;
-            return (*this);
-        }
-        
-        Myt& operator--() {
-            --current;
-            return (*this);
-        }
+            Myt operator--(int) {
+                Myt Tmp = *this;
+                --current;
+                return (Tmp);
+            }
 
-        Myt operator--(int) {
-            Myt Tmp = *this;
-            --current;
-            return (Tmp);
-        }
+            bool operator==(int Y) const {
+                return (current == (Pt)Y);
+            }
 
-        bool operator==(int Y) const {
-            return (current == (Pt)Y);
-        }
+            bool operator==(const Myt &Y) const {
+                return (current == Y.current);
+            }
 
-        bool operator==(const Myt &Y) const {
-            return (current == Y.current);
-        }
+            bool operator!=(const Myt &Y) const {
+                return (!(*this == Y));
+            }
+            
+            Myt& operator+=(D N) {
+                current += N;
+                return (*this);
+            }
 
-        bool operator!=(const Myt &Y) const {
-            return (!(*this == Y));
-        }
-         
-        Myt& operator+=(D N) {
-            current += N;
-            return (*this);
-        }
+            Myt operator+(D N) const {
+                return (Myt(current + N));
+            }
+            
+            Myt& operator-=(D N) {
+                current -= N;
+                return (*this);
+            }
 
-        Myt operator+(D N) const {
-            return (Myt(current + N));
-        }
-        
-        Myt& operator-=(D N) {
-            current -= N;
-            return (*this);
-        }
+            Myt operator-(D N) const {
+                return (Myt(current - N));
+            }
 
-        Myt& operator-(D N) const {
-            return (Myt(current - N));
-        }
+            Rt operator[] (D N) const {
+                return (*(*this + N));
+            }
 
-        Rt operator[] (D N) const {
-            return (*(*this + N));
-        }
+            bool operator<(const Myt &Y) const {
+                return (current < Y.current);
+            }
 
-        bool operator<(const Myt &Y) const {
-            return (current < Y.current);
-        }
+            bool operator>(const Myt &Y) const {
+                return (Y < *this);
+            }
 
-        bool operator>(const Myt &Y) const {
-            return (Y < *this);
-        }
+            bool operator<=(const Myt &Y) const {
+                return (!(Y < *this));
+            }
 
-        bool operator<=(const Myt &Y) const {
-            return (!(Y < *this));
-        }
+            bool operator>=(const Myt &Y) const {
+                return (!(*this < Y));
+            }
 
-        bool operator>=(const Myt &Y) const {
-            return (!(*this < Y));
-        }
+            D operator-(const Myt &Y) const {
+                return (current - Y.current);
+            }
 
-        D operator-(const Myt &Y) const {
-            return (current - Y.current);
-        }
-
-    protected:
-        Pt current;
+        protected:
+            Pt current;
         };
 
     template<class T, class D, class Pt, class Rt, class Pt2, class Rt2> inline
@@ -256,18 +255,18 @@ namespace ft {
     //template class reverse_iterator
     template <class RanIt>
         class reverse_iterator: public iterator<
-            typename ft::iterator_traits<RanIt>::iterator_category,
-            typename ft::iterator_traits<RanIt>::value_type,
-            typename ft::iterator_traits<RanIt>::difference_type,
-            typename ft::iterator_traits<RanIt>::pointer,
-            typename ft::iterator_traits<RanIt>::reference
+            typename iterator_traits<RanIt>::iterator_category,
+            typename iterator_traits<RanIt>::value_type,
+            typename iterator_traits<RanIt>::difference_type,
+            typename iterator_traits<RanIt>::pointer,
+            typename iterator_traits<RanIt>::reference
         >
         {
         public:
             typedef reverse_iterator<RanIt> Myt; 
             typedef typename iterator_traits<RanIt>::difference_type D;
             typedef typename iterator_traits<RanIt>::pointer Pt;
-            typedef typename iterator_traits<RanIt>::pointer Rt;
+            typedef typename iterator_traits<RanIt>::reference Rt;
             typedef RanIt iterator_type;
 
             reverse_iterator() {}
@@ -275,7 +274,7 @@ namespace ft {
             explicit reverse_iterator(RanIt X): current(X) {}
         
             template<class U>
-                reverse_iterator(const reverse_iterator<U> &X): current(X.base) {}
+                reverse_iterator(const reverse_iterator<U> &X): current(X.base()) {}
 
             RanIt base() const {
                 return (current);
@@ -332,6 +331,10 @@ namespace ft {
 
             Myt operator-(D N) const {
                 return (Myt(current + N));
+            }
+
+            Myt operator+(D N) const {
+                return (Myt(current - N));
             }
 
             Rt operator[] (D N) const {

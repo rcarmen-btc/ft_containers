@@ -21,8 +21,6 @@ typedef std::pair<int, char> std_pair_ic;
 
 int main() {
 
-	std::cout << (typeid(traits::iterator_category) == typeid(std::random_access_iterator_tag)) << std::endl;
-
 	// =======================================================================
 	// PAIR PAIR PAIR PAIR PAIR PAIR PAIR PAIR PAIR PAIR PAIR PAIR PAIR PAIR 
 	// ------------------------------------------------------------------------
@@ -48,8 +46,7 @@ int main() {
 	// ------------------------------------------------------------------------
 	// END_PAIR END_PAIR END_PAIR END_PAIR END_PAIR END_PAIR END_PAIR END_PAIR  
 	// ========================================================================
-	
-	ft::vector<int> a;
+
 
 	// =======================================================================
 	// STACK STACK STACK STACK STACK STACK STACK STACK STACK STACK STACK STACK

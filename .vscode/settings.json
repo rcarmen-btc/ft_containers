@@ -69,6 +69,7 @@
         "typeinfo": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "version": "cpp"
+        "version": "cpp",
+        "*.inc": "cpp"
     }
 }

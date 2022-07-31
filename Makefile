@@ -21,7 +21,7 @@ FT_OBJ_PATH =	$(addprefix $(OBJ_DIR), $(FT_OBJ))
 STD_SRC_PATH =	$(addprefix $(SRC_DIR), $(STD_SRC))
 STD_OBJ_PATH =	$(addprefix $(OBJ_DIR), $(STD_OBJ))
 
-CC = c++
+CC = c++ -g
 CFLAGS = # -Wall -Wextra -Werror -std=c++98
 OPT_FLUGS = -O -g3 -pipe
 
